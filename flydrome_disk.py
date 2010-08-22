@@ -36,6 +36,7 @@ disk_thickness = in2m(0.25)
 disk_diameter = 1.
 disk_insert_diameter = disk_diameter-mm2m(10.)*2.
 disk_insert_thickness = mm2m(500)
+central_hole_diameter = disk_diameter-0.5
 
 # hole pattern for cameras
 hole_diam = in2m(0.265) # 1/4-20 clearance
@@ -48,10 +49,15 @@ for ang in range(0.,360.,hole_ang):
     x = pat_radius*np.cos(deg2rad(ang))
     y = pat_radius*np.sin(deg2rad(ang))
     holes.append((x,y,hole_diam))
+    
+# central hole
+center_hole = Cylinder(h=1,r1=central_hole_diameter/2., r2=central_hole_diameter/2.)
 
 # assemble the three disks
 disk_top = h.disk_w_holes(disk_thickness,disk_diameter,holes,hole_mod='')
+disk_top = Difference([disk_top,center_hole])
 disk_insert = h.disk_w_holes(disk_insert_thickness,disk_insert_diameter,holes,hole_mod='')
+disk_insert = Difference([disk_insert,center_hole])
 disk_insert = Translate(disk_insert,v=[0,0,-1*disk_thickness/2.-disk_insert_thickness/2.])
 disk_bottom = Translate(disk_top,v=[0,0,-1.5*disk_thickness-disk_insert_thickness])
 
